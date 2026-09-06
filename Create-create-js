@@ -1,0 +1,167 @@
+admin-panel\js\modules\cars\create\create.js
+/*==================================================
+    CARS CREATE MODULE
+
+    Vehicle Create Page Controller
+
+    Responsible for:
+    - Loading form components
+    - Initializing brands
+    - Initializing registry
+    - Initializing create form
+
+    No:
+    - Validation
+    - API
+    - Submit Logic
+
+    Architecture:
+    IIFE Module
+
+    Version : 2.1
+
+==================================================*/
+
+const CarsCreate = (() => {
+
+    /*==================================================
+        INIT
+    ==================================================*/
+
+    async function init() {
+
+        try {
+
+            console.log(
+
+                "Cars Create Initializing..."
+
+            );
+
+            /*==============================================
+                LOAD SHARED COMPONENTS
+            ==============================================*/
+
+            if (
+
+                typeof CarsFormComponents === "undefined"
+
+            ) {
+
+                console.error(
+
+                    "CarsFormComponents is not loaded."
+
+                );
+
+                return;
+
+            }
+
+            await CarsFormComponents.loadAll();
+
+            /*==============================================
+                BRANDS
+            ==============================================*/
+
+            if (
+
+                typeof CarsBrands === "undefined"
+
+            ) {
+
+                console.error(
+
+                    "CarsBrands module is not loaded."
+
+                );
+
+                return;
+
+            }
+
+            await CarsBrands.init(
+
+                "brand_id",
+
+                "انتخاب برند"
+
+            );
+
+            /*==============================================
+                REGISTRY
+            ==============================================*/
+
+            if (
+
+                typeof CarsCreateRegistry === "undefined"
+
+            ) {
+
+                console.error(
+
+                    "CarsCreateRegistry module is not loaded."
+
+                );
+
+                return;
+
+            }
+
+            CarsCreateRegistry.init();
+
+            /*==============================================
+                FORM
+            ==============================================*/
+
+            if (
+
+                typeof CarsCreateForm === "undefined"
+
+            ) {
+
+                console.error(
+
+                    "CarsCreateForm module is not loaded."
+
+                );
+
+                return;
+
+            }
+
+            CarsCreateForm.init();
+
+            console.log(
+
+                "✅ Cars Create Ready"
+
+            );
+
+        }
+
+        catch(error) {
+
+            console.error(
+
+                "❌ Cars Create Error:",
+
+                error
+
+            );
+
+        }
+
+    }
+
+    /*==================================================
+        PUBLIC
+    ==================================================*/
+
+    return {
+
+        init
+
+    };
+
+})();
