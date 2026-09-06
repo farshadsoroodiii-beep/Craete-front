@@ -1,0 +1,331 @@
+admin-panel\js\modules\cars\create\validation.js
+/*==================================================
+    CARS CREATE VALIDATION
+
+    Responsible for:
+    - Create form validation
+    - Required fields checking
+    - Rule validation
+
+    No DOM access.
+    No UI rendering.
+    No focus management.
+
+==================================================*/
+
+const CarsCreateValidation = (() => {
+
+    /*==================================================
+        REQUIRED FIELDS
+
+        Based on Create Contract
+    ==================================================*/
+
+    const REQUIRED_FIELDS = [
+
+        "brand_id",
+
+        "model",
+
+        "display_title",
+
+        "slug",
+
+        "year",
+
+        "condition"
+
+    ];
+
+    /*==================================================
+        VALIDATE
+    ==================================================*/
+
+    function validate(data = {}) {
+
+        const errors = {};
+
+        validateRequiredFields(
+            data,
+            errors
+        );
+
+        validateYear(
+            data,
+            errors
+        );
+
+        validatePrice(
+            data,
+            errors
+        );
+
+        validateOldPrice(
+            data,
+            errors
+        );
+
+        return {
+
+            valid:
+                Object.keys(errors).length === 0,
+
+            errors
+
+        };
+
+    }
+
+    /*==================================================
+        REQUIRED VALIDATION
+    ==================================================*/
+
+    function validateRequiredFields(
+        data,
+        errors
+    ) {
+
+        REQUIRED_FIELDS.forEach(
+            field => {
+
+                const value =
+                    data[field];
+
+                if (
+
+                    !value ||
+
+                    value.toString()
+                        .trim() === ""
+
+                ) {
+
+                    errors[field] =
+                        getFieldMessage(
+                            field
+                        );
+
+                }
+
+            }
+        );
+
+    }
+
+    /*==================================================
+        YEAR VALIDATION
+    ==================================================*/
+
+    function validateYear(
+        data,
+        errors
+    ) {
+
+        if (
+            !data.year
+        ) {
+
+            return;
+
+        }
+
+        const year =
+            Number(
+                data.year
+            );
+
+        if (
+            isNaN(year)
+        ) {
+
+            errors.year =
+                "سال تولید باید عدد باشد.";
+
+            return;
+
+        }
+
+        if (
+
+            year < 1900 ||
+
+            year > 2100
+
+        ) {
+
+            errors.year =
+                "سال تولید معتبر نیست.";
+
+        }
+
+    }
+
+    /*==================================================
+        PRICE VALIDATION
+    ==================================================*/
+
+    function validatePrice(
+        data,
+        errors
+    ) {
+
+        if (
+            data.price === undefined ||
+
+            data.price === null ||
+
+            data.price === ""
+        ) {
+
+            return;
+
+        }
+
+        const price =
+            Number(
+                data.price
+            );
+
+        if (
+            isNaN(price)
+        ) {
+
+            errors.price =
+                "قیمت خودرو باید عدد باشد.";
+
+            return;
+
+        }
+
+        if (
+            price < 0
+        ) {
+
+            errors.price =
+                "قیمت خودرو نمی‌تواند منفی باشد.";
+
+        }
+
+    }
+
+    /*==================================================
+        OLD PRICE VALIDATION
+    ==================================================*/
+
+    function validateOldPrice(
+        data,
+        errors
+    ) {
+
+        if (
+
+            data.old_price === undefined ||
+
+            data.old_price === null ||
+
+            data.old_price === ""
+        ) {
+
+            return;
+
+        }
+
+        const oldPrice =
+            Number(
+                data.old_price
+            );
+
+        if (
+            isNaN(oldPrice)
+        ) {
+
+            errors.old_price =
+                "قیمت قبلی باید عدد باشد.";
+
+            return;
+
+        }
+
+        if (
+            oldPrice < 0
+        ) {
+
+            errors.old_price =
+                "قیمت قبلی نمی‌تواند منفی باشد.";
+
+            return;
+
+        }
+
+        if (
+
+            data.price !== undefined &&
+
+            data.price !== null &&
+
+            data.price !== "" &&
+
+            !isNaN(
+                Number(data.price)
+            ) &&
+
+            oldPrice <= Number(data.price)
+
+        ) {
+
+            errors.old_price =
+                "قیمت قبلی باید بیشتر از قیمت فعلی باشد.";
+
+        }
+
+    }
+
+    /*==================================================
+        ERROR MESSAGE
+    ==================================================*/
+
+    function getFieldMessage(
+        field
+    ) {
+
+        const messages = {
+
+            brand_id:
+                "انتخاب برند الزامی است.",
+
+            model:
+                "مدل خودرو الزامی است.",
+
+            display_title:
+                "عنوان نمایشی خودرو الزامی است.",
+
+            slug:
+                "slug خودرو الزامی است.",
+
+            year:
+                "سال تولید الزامی است.",
+
+            condition:
+                "وضعیت خودرو الزامی است."
+
+        };
+
+        return (
+
+            messages[field]
+
+            ||
+
+            "این فیلد الزامی است."
+
+        );
+
+    }
+
+    return {
+
+        validate
+
+    };
+
+})();
