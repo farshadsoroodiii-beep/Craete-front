@@ -1,0 +1,133 @@
+admin-panel\js\modules\cars\create\api.js
+/*==================================================
+    CARS CREATE API
+
+    Responsible for:
+    - Create car API request
+    - HTTP communication only
+
+==================================================*/
+
+const CarsCreateAPI = (() => {
+
+    /*==================================================
+        CREATE CAR
+    ==================================================*/
+
+    async function create(payload) {
+
+        if (
+            typeof ADMIN_CONFIG === "undefined"
+        ) {
+
+            throw new Error(
+                "ADMIN_CONFIG is not loaded."
+            );
+
+        }
+
+        let response;
+
+        /*==============================================
+            NETWORK REQUEST
+        ==============================================*/
+
+        try {
+
+            response =
+                await fetch(
+                    `${ADMIN_CONFIG.ADMIN_API}/cars`,
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json",
+
+                            "Authorization":
+                                `Bearer ${ADMIN_AUTH.getToken()}`
+
+                        },
+
+                        body:
+                            JSON.stringify(
+                                payload
+                            )
+
+                    }
+                );
+
+        }
+
+        catch (error) {
+
+            throw {
+
+                status:
+                    0,
+
+                data: {
+
+                    message:
+                        "Unable to connect to server."
+
+                }
+
+            };
+
+        }
+
+        let data;
+
+        /*==============================================
+            RESPONSE PARSE
+        ==============================================*/
+
+        try {
+
+            data =
+                await response.json();
+
+        }
+
+        catch (error) {
+
+            data = {
+
+                message:
+                    "Invalid server response."
+
+            };
+
+        }
+
+        /*==============================================
+            HTTP ERROR
+        ==============================================*/
+
+        if (!response.ok) {
+
+            throw {
+
+                status:
+                    response.status,
+
+                data
+
+            };
+
+        }
+
+        return data;
+
+    }
+
+    return {
+
+        create
+
+    };
+
+})();
