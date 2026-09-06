@@ -1,0 +1,337 @@
+admin-panel\js\modules\cars\create\submit.js
+/*==================================================
+    CARS CREATE SUBMIT
+
+    Responsible for:
+    - Create submit workflow
+
+    Architecture:
+    IIFE Module
+
+==================================================*/
+
+const CarsCreateSubmit = (() => {
+
+    async function submit(
+        event,
+        options = {}
+    ) {
+
+        event.preventDefault();
+
+        if (
+            FormState.isLoading()
+        ) {
+
+            return;
+
+        }
+
+        const {
+
+            form,
+
+            setLoading
+
+        } = options;
+
+        /*==============================================
+            DEPENDENCY CHECK
+        ==============================================*/
+
+        if (
+            typeof CarsCreateValidation === "undefined"
+        ) {
+
+            handleError({
+
+                message:
+                    "CarsCreateValidation is not loaded."
+
+            });
+
+            return;
+
+        }
+
+        if (
+            typeof CarsCreateMapper === "undefined"
+        ) {
+
+            handleError({
+
+                message:
+                    "CarsCreateMapper is not loaded."
+
+            });
+
+            return;
+
+        }
+
+        if (
+            typeof CarsCreateAPI === "undefined"
+        ) {
+
+            handleError({
+
+                message:
+                    "CarsCreateAPI is not loaded."
+
+            });
+
+            return;
+
+        }
+
+        if (
+            typeof FormFields === "undefined"
+        ) {
+
+            handleError({
+
+                message:
+                    "FormFields is not loaded."
+
+            });
+
+            return;
+
+        }
+
+        if (
+            typeof FormErrorManager === "undefined"
+        ) {
+
+            console.warn(
+                "FormErrorManager is not loaded."
+            );
+
+        }
+
+        if (
+            typeof setLoading !== "function"
+        ) {
+
+            handleError({
+
+                message:
+                    "Create form loading handler is not available."
+
+            });
+
+            return;
+
+        }
+
+        /*==============================================
+            CLEAR PREVIOUS ERRORS
+        ==============================================*/
+
+        if (
+            typeof FormErrorManager !== "undefined"
+        ) {
+
+            FormErrorManager.clear();
+
+        }
+
+        /*==============================================
+            COLLECT FORM DATA
+        ==============================================*/
+
+        const formData =
+
+            FormFields.collect(
+
+                form
+
+            );
+
+        /*==============================================
+            VALIDATION
+        ==============================================*/
+
+        const validationResult =
+
+            CarsCreateValidation.validate(
+
+                formData
+
+            );
+
+        if (
+
+            !validationResult.valid
+
+        ) {
+
+            if (
+
+                typeof FormErrorManager !== "undefined"
+
+            ) {
+
+                FormErrorManager.handle(
+
+                    validationResult.errors
+
+                );
+
+            }
+
+            return;
+
+        }
+
+        /*==============================================
+            MAPPER
+        ==============================================*/
+
+        const payload =
+
+            CarsCreateMapper.toPayload(
+
+                formData
+
+            );
+
+        /*==============================================
+            API
+        ==============================================*/
+
+        try {
+
+            setLoading(true);
+
+            const response =
+
+                await CarsCreateAPI.create(
+
+                    payload
+
+                );
+
+            /*==========================================
+                RESPONSE CHECK
+            ==========================================*/
+
+            if (
+
+                !response ||
+
+                response.success === false
+
+            ) {
+
+                handleError(
+
+                    response
+
+                );
+
+                return;
+
+            }
+
+            console.log(
+
+                "Create API Response:",
+
+                response
+
+            );
+
+            /*==========================================
+                SUCCESS CALLBACK
+            ==========================================*/
+
+            if (
+
+                typeof options.onSuccess === "function"
+
+            ) {
+
+                options.onSuccess(
+
+                    response
+
+                );
+
+            }
+
+        }
+
+        catch (error) {
+
+            handleError(
+
+                error
+
+            );
+
+        }
+
+        finally {
+
+            setLoading(false);
+
+        }
+
+    }
+
+    /*==================================================
+        ERROR HANDLER
+    ==================================================*/
+
+    function handleError(error) {
+
+        console.error(
+
+            "Cars Create Error:",
+
+            error
+
+        );
+
+        if (
+
+            typeof FormErrorManager !== "undefined"
+
+        ) {
+
+            FormErrorManager.handleBackend(
+
+                error
+
+            );
+
+            return;
+
+        }
+
+        if (
+
+            typeof Notification !== "undefined"
+
+        ) {
+
+            Notification.error(
+
+                error?.message ||
+
+                "خطایی در ثبت خودرو رخ داد."
+
+            );
+
+        }
+
+    }
+
+    return {
+
+        submit
+
+    };
+
+})();
